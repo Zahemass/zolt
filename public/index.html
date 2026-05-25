@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZOLT | High Voltage Fast Food</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- GSAP CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #050505;
+            --primary: #ff6b00;
+            --accent: #ffb347;
+            --text: rgba(255, 255, 255, 0.92);
+            --text-dim: rgba(255, 255, 255, 0.55);
+            --header-h: 72px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1,
+        h2,
+        h3,
+        .heading {
+            font-family: 'Bebas Neue', sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* --- Loading Screen --- */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #050505;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .loader-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 64px;
+            letter-spacing: 0.18em;
+            color: var(--primary);
+            margin-bottom: 24px;
+            text-shadow: 0 0 20px rgba(255, 107, 0, 0.3);
+        }
+
+        .loader-progress-container {
+            width: 220px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .loader-progress-bar {
+            position: absolute;
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .loader-text {
+            font-size: 12px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* --- Header --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-h);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 48px;
+            z-index: 200;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 32px;
+            letter-spacing: 0.18em;
+            color: var(--primary);
+            text-decoration: none;
+            text-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-links a {
+            font-size: 13px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            text-decoration: none;
+            letter-spacing: 0.08em;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .hamburger {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            width: 18px;
+            height: 2px;
+            background: white;
+            display: block;
+        }
+
+        /* --- Scroll Indicator --- */
+        .scroll-indicator {
+            position: fixed;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.12);
+            z-index: 150;
+        }
+
+        .scroll-fill {
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to bottom, var(--primary), var(--accent));
+        }
+
+        /* ============================= */
+        /* SECTION 1: HOME               */
+        /* ============================= */
+        .home {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            background: #000000;
+            padding-top: var(--header-h);
+        }
+
+        .home::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(to bottom, transparent, #000000);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* Fire / ember glow at the bottom */
+        .ember-bg {
+            position: absolute;
+            bottom: 0;
+            left: 80%;
+            width: 100%;
+            height: 45%;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse at 50% 100%, rgba(255, 107, 0, 0.18) 0%, transparent 55%),
+                radial-gradient(ellipse at 30% 100%, rgba(255, 60, 0, 0.10) 0%, transparent 45%),
+                radial-gradient(ellipse at 70% 100%, rgba(255, 80, 0, 0.10) 0%, transparent 45%);
+            z-index: 1;
+        }
+
+        .home-content {
+            position: relative;
+            z-index: 3;
+            padding: 40px 64px 60px;
+            max-width: 550px;
+            flex-shrink: 0;
+        }
+
+        .home-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 107, 0, 0.1);
+            border: 1px solid rgba(255, 107, 0, 0.2);
+            padding: 6px 16px;
+            border-radius: 100px;
+            margin-bottom: 28px;
+        }
+
+        .home-badge span {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .home-title {
+            font-family: 'Bebas Neue', sans-serif;
+            line-height: 0.88;
+            margin-bottom: 28px;
+        }
+
+        .home-title .line1 {
+            font-size: clamp(48px, 6vw, 72px);
+            color: white;
+            display: block;
+            letter-spacing: 0.02em;
+        }
+
+        .home-title .line2 {
+            font-size: clamp(80px, 12vw, 160px);
+            color: var(--primary);
+            display: block;
+            text-shadow: 0 0 60px rgba(255, 107, 0, 0.5);
+            letter-spacing: -0.02em;
+        }
+
+        .home-desc {
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 36px;
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        .home-desc strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .order-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 40px;
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            font-family: 'Inter', sans-serif;
+            font-weight: bold;
+            font-size: 14px;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .order-btn:hover {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 30px rgba(255, 107, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .home-image {
+            position: absolute;
+            right: -5%;
+            top: 50%;
+            transform: translateY(-48%);
+            width: 65%;
+            max-width: 850px;
+            z-index: 2;
+        }
+
+        .home-image img {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 0 80px rgba(255, 107, 0, 0.2));
+            animation: floatProduct 4s ease-in-out infinite;
+        }
+
+        @keyframes floatProduct {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+        /* ZOLT Stamp Badge */
+        .home-stamp {
+            position: absolute;
+            top: 120px;
+            right: 50px;
+            width: 90px;
+            height: 90px;
+            z-index: 10;
+            animation: spinStamp 12s linear infinite;
+        }
+
+        .home-stamp svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        @keyframes spinStamp {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Social Icons */
+        .home-social {
+            position: absolute;
+            right: 28px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            z-index: 10;
+        }
+
+        .home-social a {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s, transform 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .home-social a:hover {
+            color: var(--primary);
+            transform: scale(1.15);
+            border-color: var(--primary);
+        }
+
+        .home-scroll-hint {
+            position: absolute;
+            bottom: 40px;
+            left: 64px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-dim);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .scroll-arrow {
+            width: 28px;
+            height: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            animation: bounceDown 2s ease-in-out infinite;
+        }
+
+        @keyframes bounceDown {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(5px);
+            }
+        }
+
+        /* ============================= */
+        /* SECTION 2: ANIMATED FRAMES    */
+        /* ============================= */
+        .frames-section {
+            height: 800vh;
+            position: relative;
+        }
+
+        .video-container {
+            position: sticky;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+
+        /* --- Text Overlays --- */
+        .overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            display: flex;
+            padding: 10vh 8vw;
+        }
+
+        .overlay-item {
+            position: absolute;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .zolt-center {
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 48px;
+            letter-spacing: 0.25em;
+            color: var(--primary);
+        }
+
+        .not-just-food {
+            bottom: 10%;
+            left: 8%;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .chaos {
+            top: 45%;
+            left: 8%;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 82px;
+            color: white;
+            max-width: 500px;
+            line-height: 1;
+        }
+
+        .traits {
+            top: 50%;
+            right: 8%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .trait {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 96px;
+            color: white;
+            text-shadow: 0 0 30px rgba(255, 107, 0, 0.4);
+            line-height: 0.8;
+        }
+
+        .watch-flavor {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            text-align: center;
+        }
+
+        .madness-list {
+            top: 50%;
+            left: 8%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .madness-item {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 88px;
+            color: white;
+            line-height: 1;
+        }
+
+        .cta-container {
+            position: absolute;
+            top: 75%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: auto;
+        }
+
+        /* ============================= */
+        /* SECTION 3: ENDING             */
+        /* ============================= */
+
+        /* --- Feature Cards --- */
+        .features {
+            padding: 120px 64px;
+            background: #070707;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .feature-card {
+            flex: 1;
+            min-width: 280px;
+            max-width: 360px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 40px 32px;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            transition: transform 0.5s cubic-bezier(0.2, 1, 0.3, 1), box-shadow 0.5s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 107, 0, 0.08);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(255, 107, 0, 0.1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 24px;
+        }
+
+        .feature-info h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            color: white;
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+        }
+
+        .feature-info p {
+            font-size: 13px;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        /* --- Tagline --- */
+        .tagline {
+            padding: 80px 64px;
+            text-align: center;
+            background: #070707;
+        }
+
+        .tagline-text {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 28px;
+            letter-spacing: 0.25em;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .tagline-bolt {
+            font-size: 24px;
+        }
+
+        /* --- Newsletter --- */
+        .newsletter {
+            padding: 140px 80px;
+            background: linear-gradient(180deg, #070707 0%, #0c0805 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .newsletter::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 50% 100%, rgba(255, 107, 0, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .newsletter-headline {
+            font-size: 56px;
+            margin-bottom: 16px;
+            color: white;
+            position: relative;
+        }
+
+        .newsletter-sub {
+            font-size: 16px;
+            color: var(--text-dim);
+            margin-bottom: 48px;
+            position: relative;
+        }
+
+        .newsletter-form {
+            width: 100%;
+            max-width: 560px;
+            display: flex;
+            gap: 0;
+            position: relative;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: none;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            padding: 16px 20px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .newsletter-form input:focus {
+            border-color: rgba(255, 107, 0, 0.4);
+        }
+
+        .newsletter-form input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .newsletter-form button {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-family: 'Inter', sans-serif;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.1em;
+            padding: 16px 28px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .newsletter-form button:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* --- Footer --- */
+        footer {
+            padding: 48px 48px 32px;
+            border-top: 1px solid rgba(255, 107, 0, 0.12);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-dim);
+            font-size: 12px;
+            background: #050505;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .footer-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 28px;
+            color: var(--primary);
+            letter-spacing: 0.12em;
+        }
+
+        .footer-tagline {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-dim);
+        }
+
+        .footer-center {
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .footer-social {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .footer-social a {
+            color: var(--text-dim);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            transition: color 0.3s;
+        }
+
+        .footer-social a:hover {
+            color: var(--primary);
+        }
+
+        .footer-social .sep {
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 900px) {
+            .home-content {
+                padding: 80px 24px 40px;
+                max-width: 100%;
+                text-align: center;
+            }
+
+            .home-image {
+                position: relative;
+                right: auto;
+                top: auto;
+                transform: none;
+                width: 90%;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+
+            .home {
+                flex-direction: column;
+                text-align: center;
+                padding-top: var(--header-h);
+            }
+
+            .home-title .line1 {
+                font-size: 48px;
+            }
+
+            .home-title .line2 {
+                font-size: 72px;
+            }
+
+            .home-scroll-hint {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .home-stamp {
+                width: 60px;
+                height: 60px;
+                top: 90px;
+                right: 20px;
+            }
+
+            .home-social {
+                display: none;
+            }
+
+            header {
+                padding: 0 24px;
+            }
+
+            .features {
+                padding: 80px 24px;
+            }
+
+            .newsletter {
+                padding: 100px 24px;
+            }
+
+            .newsletter-headline {
+                font-size: 40px;
+            }
+
+            footer {
+                flex-direction: column;
+                gap: 24px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="loader-logo">ZOLT</div>
+        <div class="loader-progress-container">
+            <div class="loader-progress-bar" id="load-bar"></div>
+        </div>
+        <div class="loader-text">Preparing the madness...</div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <a href="#" class="logo">ZOLT</a>
+        <div class="nav-links">
+            <a href="#">Menu</a>
+            <a href="#">About</a>
+            <a href="#">Order</a>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Scroll Progress -->
+    <div class="scroll-indicator">
+        <div class="scroll-fill" id="scroll-fill"></div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SECTION 1: HOME                              -->
+    <!-- ============================================ -->
+    <section class="home" id="home">
+        <div class="ember-bg"></div>
+
+        <!-- ZOLT Stamp Badge -->
+        <div class="home-stamp">
+            <svg viewBox="0 0 120 120">
+                <defs>
+                    <path id="stampCircle" d="M 60,60 m -42,0 a 42,42 0 1,1 84,0 a 42,42 0 1,1 -84,0" />
+                </defs>
+                <circle cx="60" cy="60" r="52" fill="none" stroke="var(--primary)" stroke-width="2" opacity="0.6" />
+                <circle cx="60" cy="60" r="44" fill="none" stroke="var(--primary)" stroke-width="1" opacity="0.3" />
+                <text fill="var(--primary)" font-family="'Bebas Neue', sans-serif" font-size="9" letter-spacing="3">
+                    <textPath href="#stampCircle" startOffset="0%">HIGH VOLTAGE FOOD • HIGH VOLTAGE FOOD •</textPath>
+                </text>
+                <text x="60" y="56" text-anchor="middle" fill="var(--primary)" font-family="'Bebas Neue', sans-serif"
+                    font-size="26" letter-spacing="3">⚡</text>
+                <text x="60" y="72" text-anchor="middle" fill="var(--primary)" font-family="'Bebas Neue', sans-serif"
+                    font-size="14" letter-spacing="4">ZOLT</text>
+            </svg>
+        </div>
+
+        <!-- Social Icons -->
+        <div class="home-social">
+            <a href="#" aria-label="Instagram">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" />
+                    <circle cx="12" cy="12" r="5" />
+                    <circle cx="17.5" cy="6.5" r="1.5" />
+                </svg>
+            </a>
+            <a href="#" aria-label="YouTube">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                        d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z" />
+                    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
+                </svg>
+            </a>
+            <a href="#" aria-label="TikTok">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1 0-5.78 2.87 2.87 0 0 1 .88.14V9.01a6.32 6.32 0 0 0-1-.08 6.29 6.29 0 0 0 0 12.58 6.29 6.29 0 0 0 6.28-6.29V8.78a8.26 8.26 0 0 0 3.94 1v-3.1z" />
+                </svg>
+            </a>
+        </div>
+
+        <!-- Text Content -->
+        <div class="home-content">
+            <div class="home-badge">
+                <span>⚡ High Voltage Food</span>
+            </div>
+            <h1 class="home-title">
+                <span class="line1">Pocket Full of</span>
+                <span class="line2">Chaos</span>
+            </h1>
+            <p class="home-desc">
+                Crispy chicken. Insane sauces.<br>
+                Explosive flavor in every bite.<br>
+                This isn't food. <strong>This is ZOLT.</strong>
+            </p>
+            <a href="#" class="order-btn">Order Now ⚡</a>
+        </div>
+
+        <!-- Product Image -->
+        <div class="home-image">
+            <img src="/home section.png" alt="ZOLT Lay's Chicken">
+        </div>
+
+        <!-- Scroll Hint -->
+        <div class="home-scroll-hint">
+            <div class="scroll-arrow">↓</div>
+            Scroll
+        </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- SECTION 2: ANIMATED FRAMES                   -->
+    <!-- ============================================ -->
+    <div class="frames-section" id="frames-section">
+        <div class="video-container">
+            <canvas id="v0"></canvas>
+
+            <div class="overlay">
+                <div class="overlay-item zolt-center" id="t1">ZOLT</div>
+                <div class="overlay-item not-just-food" id="t2">Not just food.</div>
+                <div class="overlay-item chaos" id="t3">A pocket full of chaos.</div>
+
+                <div class="overlay-item traits">
+                    <div class="trait" id="t4-1">CRISPY</div>
+                    <div class="trait" id="t4-2">SPICY</div>
+                    <div class="trait" id="t4-3">LOUD</div>
+                </div>
+
+                <div class="overlay-item watch-flavor" id="t5">Watch the flavor explode.</div>
+
+                <div class="overlay-item madness-list">
+                    <div class="madness-item" id="t6-1">Chicken.</div>
+                    <div class="madness-item" id="t6-2">Sauce.</div>
+                    <div class="madness-item" id="t6-3">Madness.</div>
+                </div>
+
+                <div class="cta-container" id="t8">
+                    <a href="#" class="order-btn">ORDER NOW ⚡</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SECTION 3: ENDING                            -->
+    <!-- ============================================ -->
+
+    <!-- Feature Cards -->
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-info">
+                <h3>Bold Flavor</h3>
+                <p>Explosive taste that hits different.</p>
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔥</div>
+            <div class="feature-info">
+                <h3>Street Style</h3>
+                <p>Inspired by streets. Made to crave.</p>
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🌀</div>
+            <div class="feature-info">
+                <h3>Creamy Chaos</h3>
+                <p>Sauces so good, it's illegal.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tagline -->
+    <section class="tagline">
+        <div class="tagline-text">This isn't food. This is ZOLT.</div>
+        <div class="tagline-bolt">⚡</div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="newsletter">
+        <h2 class="heading newsletter-headline">Join the ZOLT Drop.</h2>
+        <p class="newsletter-sub">New drops. New madness. No boring food.</p>
+        <form class="newsletter-form" onsubmit="event.preventDefault()">
+            <input type="email" placeholder="Enter your email">
+            <button type="submit">Subscribe &rarr;</button>
+        </form>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-brand">
+            <div class="footer-logo">ZOLT</div>
+            <div class="footer-tagline">High Voltage Food</div>
+        </div>
+        <div class="footer-center">&copy; 2026 ZOLT. High Voltage Food.</div>
+        <div class="footer-social">
+            <a href="#">Instagram</a>
+            <span class="sep">—</span>
+            <a href="#">YouTube</a>
+            <span class="sep">—</span>
+            <a href="#">TikTok</a>
+        </div>
+    </footer>
+
+    <!-- ============================================ -->
+    <!-- SCRIPTS                                      -->
+    <!-- ============================================ -->
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        const canvas = document.getElementById('v0');
+        const context = canvas.getContext('2d');
+        const loadBar = document.getElementById('load-bar');
+        const loader = document.getElementById('loader');
+        const scrollFill = document.getElementById('scroll-fill');
+
+        // Loading Logic
+        let progress = 0;
+        const loadInt = setInterval(() => {
+            progress += Math.random() * 5;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(loadInt);
+                hideLoader();
+            }
+            loadBar.style.width = progress + '%';
+        }, 80);
+
+        function hideLoader() {
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.visibility = 'hidden';
+            }, 800);
+        }
+
+        // =============================
+        // Frame Preloading
+        // =============================
+        const frameCount = 205;
+        const startFrame = 36;
+        const getFramePath = index => (
+            `/frames/frame_${(index + startFrame - 1).toString().padStart(4, '0')}.png`
+        );
+
+        const images = [];
+        let framesLoaded = 0;
+
+        for (let i = 1; i <= frameCount; i++) {
+            const img = new Image();
+            img.src = getFramePath(i);
+            img.onload = () => {
+                framesLoaded++;
+                const p = (framesLoaded / frameCount) * 100;
+                if (progress < p) progress = p;
+                loadBar.style.width = progress + '%';
+
+                if (framesLoaded === frameCount) {
+                    renderFrame(1);
+                }
+            };
+            images.push(img);
+        }
+
+        function renderFrame(index) {
+            const img = images[index - 1];
+            if (!img || !img.complete) return;
+
+            const canvasWidth = window.innerWidth;
+            const canvasHeight = window.innerHeight;
+            const imgWidth = img.width;
+            const imgHeight = img.height;
+
+            const ratio = Math.max(canvasWidth / imgWidth, canvasHeight / imgHeight);
+            const newWidth = imgWidth * ratio;
+            const newHeight = imgHeight * ratio;
+            const x = (canvasWidth - newWidth) / 2;
+            const y = (canvasHeight - newHeight) / 2;
+
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            context.clearRect(0, 0, canvasWidth, canvasHeight);
+            context.drawImage(img, x, y, newWidth, newHeight);
+        }
+
+        // =============================
+        // Scroll Sync
+        // =============================
+        let delay = 0;
+
+        window.addEventListener('scroll', () => {
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrolled = (window.scrollY / totalHeight) * 100;
+            scrollFill.style.height = scrolled + '%';
+        });
+
+        const framesSection = document.getElementById('frames-section');
+
+        function syncFrames() {
+            const rect = framesSection.getBoundingClientRect();
+            const sectionTop = framesSection.offsetTop;
+            const sectionHeight = framesSection.offsetHeight;
+            const scrollableLength = sectionHeight - window.innerHeight;
+
+            const scrolledInSection = window.pageYOffset - sectionTop;
+            const p = Math.max(0, Math.min(1, scrolledInSection / scrollableLength));
+
+            delay += (p - delay) * 0.1;
+            const frameIndex = Math.floor(delay * (frameCount - 1)) + 1;
+
+            renderFrame(frameIndex);
+            requestAnimationFrame(syncFrames);
+        }
+
+        syncFrames();
+
+        // =============================
+        // GSAP: Home Section Animations
+        // =============================
+        gsap.from('.home-badge', { opacity: 0, y: 20, duration: 0.8, delay: 1.5 });
+        gsap.from('.home-title .line1', { opacity: 0, y: 40, duration: 0.8, delay: 1.7 });
+        gsap.from('.home-title .line2', { opacity: 0, y: 40, duration: 0.8, delay: 1.9 });
+        gsap.from('.home-desc', { opacity: 0, y: 20, duration: 0.6, delay: 2.1 });
+        gsap.from('.home .order-btn', { opacity: 0, y: 20, duration: 0.6, delay: 2.3 });
+        gsap.from('.home-image img', { opacity: 0, scale: 0.9, duration: 1, delay: 1.6, ease: 'power2.out' });
+        gsap.from('.home-scroll-hint', { opacity: 0, duration: 0.6, delay: 2.5 });
+        gsap.from('.home-stamp', { opacity: 0, scale: 0.5, rotation: -180, duration: 1, delay: 2.0, ease: 'back.out(1.7)' });
+        gsap.from('.home-social a', { opacity: 0, x: 20, duration: 0.5, delay: 2.2, stagger: 0.15 });
+
+        // =============================
+        // GSAP: Frame Overlays
+        // =============================
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".frames-section",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: true
+            }
+        });
+
+        // 5% - ZOLT
+        tl.to("#t1", { opacity: 1, visibility: 'visible', duration: 0.1 }, 0.05);
+        tl.to("#t1", { opacity: 0, duration: 0.1 }, 0.12);
+
+        // 15% - Not just food
+        tl.to("#t2", { opacity: 1, visibility: 'visible', duration: 0.1 }, 0.15);
+        tl.to("#t2", { opacity: 0, duration: 0.1 }, 0.22);
+
+        // 25% - Chaos
+        tl.fromTo("#t3", { opacity: 0, x: -50 }, { opacity: 1, x: 0, visibility: 'visible', duration: 0.1 }, 0.25);
+        tl.to("#t3", { opacity: 0, x: 50, duration: 0.1 }, 0.35);
+
+        // 40% - Traits
+        tl.to(".traits", { visibility: 'visible', opacity: 1, duration: 0.01 }, 0.4);
+        tl.fromTo("#t4-1", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.05 }, 0.4);
+        tl.fromTo("#t4-2", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.05 }, 0.43);
+        tl.fromTo("#t4-3", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.05 }, 0.46);
+        tl.to(".traits", { opacity: 0, duration: 0.1 }, 0.52);
+
+        // 55% - Watch flavor
+        tl.to("#t5", { opacity: 1, visibility: 'visible', duration: 0.1 }, 0.55);
+        tl.to("#t5", { opacity: 0, duration: 0.1 }, 0.63);
+
+        // 68% - Madness List
+        tl.to(".madness-list", { visibility: 'visible', opacity: 1, duration: 0.01 }, 0.68);
+        tl.fromTo("#t6-1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.05 }, 0.68);
+        tl.fromTo("#t6-2", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.05 }, 0.72);
+        tl.fromTo("#t6-3", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.05 }, 0.76);
+        tl.to(".madness-list", { opacity: 0, duration: 0.1 }, 0.80);
+
+        // 94% - CTA
+        tl.to("#t8", { opacity: 1, visibility: 'visible', y: 0, duration: 0.1 }, 0.94);
+
+        // =============================
+        // GSAP: Ending Section Reveals
+        // =============================
+        gsap.utils.toArray('.feature-card').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 85%'
+                },
+                opacity: 0,
+                y: 40,
+                duration: 0.6,
+                delay: i * 0.15
+            });
+        });
+
+        gsap.from('.tagline-text', {
+            scrollTrigger: { trigger: '.tagline', start: 'top 80%' },
+            opacity: 0,
+            y: 20,
+            duration: 0.8
+        });
+
+        gsap.from('.newsletter-headline', {
+            scrollTrigger: { trigger: '.newsletter', start: 'top 80%' },
+            opacity: 0,
+            y: 30,
+            duration: 0.8
+        });
+    </script>
+</body>
+
+</html>
